@@ -17,6 +17,11 @@ class PhotoController extends Controller
     {
         $this->authorize('update', $album);
 
+        if ($request->hasFile('images')) {
+            $phpError = $request->file('images')[0]->getErrorMessage();
+            \Log::error("Alasan PHP menolak file: " . $phpError);
+        }
+
         $validated = $request->validate([
             'images.*' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:20480',
             'title' => 'nullable|string|max:255',
