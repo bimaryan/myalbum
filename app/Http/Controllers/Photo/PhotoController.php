@@ -6,8 +6,8 @@ use App\Events\PhotoUploaded;
 use App\Http\Controllers\Controller;
 use App\Models\Album;
 use App\Models\Photo;
-use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Http\Request;
 
 class PhotoController extends Controller
 {
@@ -15,20 +15,6 @@ class PhotoController extends Controller
 
     public function upload(Request $request, Album $album)
     {
-        if ($request->hasFile('images')) {
-            $file = $request->file('images')[0];
-            if (!$file->isValid()) {
-                return response()->json([
-                    'status_debug' => 'PHP menolak file ini di level server!',
-                    'kode_error_php' => $file->getError(),
-                    'alasan_asli' => $file->getErrorMessage(),
-                    'php_upload_limit' => ini_get('upload_max_filesize'),
-                    'php_post_limit' => ini_get('post_max_size'),
-                    'folder_temp_php' => sys_get_temp_dir(),
-                ], 400);
-            }
-        }
-
         $this->authorize('update', $album);
 
         $validated = $request->validate([
@@ -105,6 +91,24 @@ class PhotoController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Foto berhasil dihapus!',
+        ]);
+    }
+
+    public function update(Request $request, Photo $photo)
+    {
+        $this->authorize('update', $photo->album);
+
+        $validated = $request->validate([
+            'title' => 'nullable|string|max:255',
+            'description' => 'nullable|string',
+        ]);
+
+        $photo->update($validated);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Detail foto berhasil diperbarui!',
+            'photo' => $photo,
         ]);
     }
 

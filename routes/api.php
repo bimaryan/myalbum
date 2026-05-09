@@ -42,15 +42,6 @@ Route::middleware('auth:sanctum')->group(function () {
     // Photos
     Route::post('/album/{album}/photos', [PhotoController::class, 'upload']);
     Route::delete('/photos/{photo}', [PhotoController::class, 'destroy']);
+    Route::post('/photos/{photo}/update', [PhotoController::class, 'update']);
     Route::post('/album/{album}/photos/reorder', [PhotoController::class, 'reorder']);
-
-    Route::post('/test-upload', function (Request $request) {
-        return response()->json([
-            'status' => 'Mencari Pelaku Utama...',
-            'error_upload' => $_FILES['images']['error'] ?? 'Tidak ada file',
-            'folder_temp_nyasar' => sys_get_temp_dir(),
-            'FILE_PHP_INI_ASLI_YANG_DIBACA' => php_ini_loaded_file(),
-            'file_tambahan_lain' => php_ini_scanned_files(),
-        ]);
-    });
 });
