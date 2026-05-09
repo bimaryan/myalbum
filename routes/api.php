@@ -46,10 +46,11 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::post('/test-upload', function (Request $request) {
         return response()->json([
-            'status' => 'Jalur Test Terbuka!',
-            'raw_files_dari_php' => $_FILES,
-            'php_upload_limit' => ini_get('upload_max_filesize'),
-            'folder_temp' => sys_get_temp_dir(),
+            'status' => 'Mencari Pelaku Utama...',
+            'error_upload' => $_FILES['images']['error'] ?? 'Tidak ada file',
+            'folder_temp_nyasar' => sys_get_temp_dir(),
+            'FILE_PHP_INI_ASLI_YANG_DIBACA' => php_ini_loaded_file(),
+            'file_tambahan_lain' => php_ini_scanned_files(),
         ]);
     });
 });
