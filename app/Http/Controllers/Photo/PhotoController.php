@@ -18,7 +18,7 @@ class PhotoController extends Controller
         $this->authorize('update', $album);
 
         $validated = $request->validate([
-            'images.*' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
+            'images.*' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:20480',
             'title' => 'nullable|string|max:255',
             'description' => 'nullable|string',
         ]);
