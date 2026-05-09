@@ -7,9 +7,12 @@ use App\Http\Controllers\Controller;
 use App\Models\Album;
 use App\Models\Photo;
 use Illuminate\Http\Request;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class PhotoController extends Controller
 {
+    use AuthorizesRequests;
+
     public function upload(Request $request, Album $album)
     {
         $this->authorize('update', $album);
