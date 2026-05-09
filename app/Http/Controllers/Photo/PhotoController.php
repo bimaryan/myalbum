@@ -25,12 +25,23 @@ class PhotoController extends Controller
 
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $image) {
+                // 1. Ekstrak data SEBELUM file dipindahkan!
+                $mimeType = $image->getMimeType();
+                $fileSize = $image->getSize();
+
+                // Ambil dimensi gambar (width & height)
+                $dimensions = getimagesize($image->getPathname());
+                $width = $dimensions ? $dimensions[0] : null;
+                $height = $dimensions ? $dimensions[1] : null;
+
+                // 2. Pindahkan file
                 $filename = time().'_'.$image->hashName();
                 $directory = 'uploads/album_photos/'.$album->id;
 
                 $image->move(public_path($directory), $filename);
                 $fullPath = $directory.'/'.$filename;
 
+                // 3. Simpan ke Database
                 $photo = Photo::create([
                     'album_id' => $album->id,
                     'user_id' => auth()->id(),
@@ -38,15 +49,17 @@ class PhotoController extends Controller
                     'description' => $request->input('description'),
                     'image_path' => $fullPath,
                     'image_url' => asset($fullPath),
-                    'mime_type' => $image->getMimeType(),
-                    'file_size' => filesize(public_path($fullPath)),
+                    'mime_type' => $mimeType,
+                    'file_size' => $fileSize,
+                    'width' => $width,       // Data dimensi ditambahkan
+                    'height' => $height,     // Data dimensi ditambahkan
                     'order' => Photo::where('album_id', $album->id)->max('order') + 1,
                 ]);
 
                 $uploadedPhotos[] = $photo;
                 $uploadedCount++;
 
-                // TRIGGER LARAVEL REVERB BROADCAST per foto (opsional, bisa digabung)
+                // TRIGGER LARAVEL REVERB BROADCAST
                 broadcast(new PhotoUploaded($photo))->toOthers();
             }
         }
