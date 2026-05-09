@@ -1,10 +1,10 @@
 <?php
 
+use App\Http\Controllers\Album\AlbumController;
+use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\Photo\PhotoController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Auth\AuthController;
-use App\Http\Controllers\Album\AlbumController;
-use App\Http\Controllers\Photo\PhotoController;
 
 /*
 |--------------------------------------------------------------------------
@@ -26,9 +26,9 @@ Route::get('/album/{album}', [AlbumController::class, 'show']);
 |--------------------------------------------------------------------------
 */
 Route::middleware('auth:sanctum')->group(function () {
-    
+
     Route::post('/logout', [AuthController::class, 'logout']);
-    
+
     // User Profile (Bawaan biasa kepake buat Flutter nyari data user login)
     Route::get('/user', function (Request $request) {
         return response()->json(['success' => true, 'data' => $request->user()]);
@@ -43,4 +43,13 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/album/{album}/photos', [PhotoController::class, 'upload']);
     Route::delete('/photos/{photo}', [PhotoController::class, 'destroy']);
     Route::post('/album/{album}/photos/reorder', [PhotoController::class, 'reorder']);
+
+    Route::post('/test-upload', function (Request $request) {
+        return response()->json([
+            'status' => 'Jalur Test Terbuka!',
+            'raw_files_dari_php' => $_FILES,
+            'php_upload_limit' => ini_get('upload_max_filesize'),
+            'folder_temp' => sys_get_temp_dir(),
+        ]);
+    });
 });
