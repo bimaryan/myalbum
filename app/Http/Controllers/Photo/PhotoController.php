@@ -15,12 +15,21 @@ class PhotoController extends Controller
 
     public function upload(Request $request, Album $album)
     {
-        $this->authorize('update', $album);
-
         if ($request->hasFile('images')) {
-            $phpError = $request->file('images')[0]->getErrorMessage();
-            \Log::error("Alasan PHP menolak file: " . $phpError);
+            $file = $request->file('images')[0];
+            if (!$file->isValid()) {
+                return response()->json([
+                    'status_debug' => 'PHP menolak file ini di level server!',
+                    'kode_error_php' => $file->getError(),
+                    'alasan_asli' => $file->getErrorMessage(),
+                    'php_upload_limit' => ini_get('upload_max_filesize'),
+                    'php_post_limit' => ini_get('post_max_size'),
+                    'folder_temp_php' => sys_get_temp_dir(),
+                ], 400);
+            }
         }
+
+        $this->authorize('update', $album);
 
         $validated = $request->validate([
             'images.*' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:20480',
