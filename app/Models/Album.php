@@ -50,9 +50,25 @@ class Album extends Model
 
         static::creating(function ($album) {
             if (! $album->slug) {
-                $album->slug = Str::slug($album->title);
+                $album->slug = static::uniqueSlug($album->title);
             }
         });
+    }
+
+    /**
+     * Generate slug yang dijamin unik (judul sama tidak akan error).
+     */
+    protected static function uniqueSlug(string $title): string
+    {
+        $base = Str::slug($title);
+        $slug = $base;
+        $counter = 2;
+
+        while (static::where('slug', $slug)->exists()) {
+            $slug = $base.'-'.$counter++;
+        }
+
+        return $slug;
     }
 
     /**

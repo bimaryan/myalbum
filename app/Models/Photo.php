@@ -48,7 +48,8 @@ class Photo extends Model
             return $value;
         }
 
-        return asset('storage/'.$value);
+        // Path relatif disimpan di DB, URL penuh dibuat saat request (ikut APP_URL server)
+        return asset($value);
     }
 
     /**
@@ -59,8 +60,8 @@ class Photo extends Model
         parent::boot();
 
         static::deleting(function ($photo) {
-            if ($photo->image_path && file_exists(storage_path('app/public/'.$photo->image_path))) {
-                unlink(storage_path('app/public/'.$photo->image_path));
+            if ($photo->image_path && file_exists(public_path($photo->image_path))) {
+                unlink(public_path($photo->image_path));
             }
         });
     }

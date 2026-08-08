@@ -5,12 +5,12 @@ namespace App\Events;
 use App\Models\Photo; // <-- Import Model Photo
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcast; // <-- Wajib ada
+use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow; // <-- Wajib ada
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-// Tambahin "implements ShouldBroadcast" di sini
-class PhotoUploaded implements ShouldBroadcast
+// Broadcast langsung tanpa antrian queue
+class PhotoUploaded implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -32,9 +32,9 @@ class PhotoUploaded implements ShouldBroadcast
      */
     public function broadcastOn(): array
     {
-        // Broadcast ke channel spesifik per album
+        // Broadcast ke channel spesifik per album (pakai SLUG agar cocok dengan Flutter)
         return [
-            new Channel('album.'.$this->photo->album_id),
+            new Channel('album.'.$this->photo->album->slug),
         ];
     }
 

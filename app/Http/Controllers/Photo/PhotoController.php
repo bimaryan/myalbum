@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Photo;
 
+use App\Events\PhotoDeleted;
 use App\Events\PhotoUploaded;
 use App\Http\Controllers\Controller;
 use App\Models\Album;
@@ -51,7 +52,7 @@ class PhotoController extends Controller
                     'title' => $request->input('title'),
                     'description' => $request->input('description'),
                     'image_path' => $fullPath,
-                    'image_url' => asset($fullPath),
+                    'image_url' => $fullPath, // Path relatif; URL penuh dibuat accessor (ikut APP_URL server)
                     'mime_type' => $mimeType,
                     'file_size' => $fileSize,
                     'width' => $width,       // Data dimensi ditambahkan
@@ -80,6 +81,9 @@ class PhotoController extends Controller
     {
         $album = $photo->album;
         $this->authorize('update', $album);
+
+        // Broadcast dulu sebelum foto dihapus (biar listener dapat slug album)
+        broadcast(new PhotoDeleted($photo->id, $album->slug));
 
         if ($photo->image_path && file_exists(public_path($photo->image_path))) {
             unlink(public_path($photo->image_path));

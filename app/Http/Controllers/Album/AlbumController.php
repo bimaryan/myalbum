@@ -5,16 +5,19 @@ namespace App\Http\Controllers\Album;
 use App\Events\AlbumCreated;
 use App\Http\Controllers\Controller;
 use App\Models\Album;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 
 class AlbumController extends Controller
 {
+    use AuthorizesRequests;
+
     public function index()
     {
         $albums = Album::where('status', 'published')
             ->with('photos')
             ->orderBy('published_at', 'desc')
-            ->paginate(12);
+            ->paginate(500); // Semua album tampil; aplikasi tidak punya pagination UI
 
         return response()->json([
             'success' => true,
@@ -24,9 +27,7 @@ class AlbumController extends Controller
 
     public function show(Album $album)
     {
-        if ($album->status !== 'published' && auth()->id() !== $album->user_id) {
-            return response()->json(['success' => false, 'message' => 'Album tidak ditemukan'], 404);
-        }
+        $this->authorize('view', $album);
 
         $album->load('photos');
 
@@ -56,6 +57,9 @@ class AlbumController extends Controller
         $validated['published_at'] = $validated['status'] === 'published' ? now() : null;
 
         $album = Album::create($validated);
+
+        // Muat relasi photos biar payload event realtime lengkap
+        $album->load('photos');
 
         // TRIGGER LARAVEL REVERB BROADCAST
         broadcast(new AlbumCreated($album))->toOthers();

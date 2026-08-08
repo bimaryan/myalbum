@@ -5,13 +5,12 @@ namespace App\Events;
 use App\Models\Album; // <-- Jangan lupa import Model-nya
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Broadcasting\PrivateChannel;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcast; // <-- Wajib ada
+use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow; // <-- Wajib ada
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-// Tambahin "implements ShouldBroadcast" di sini
-class AlbumCreated implements ShouldBroadcast
+// Broadcast langsung tanpa antrian queue
+class AlbumCreated implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 

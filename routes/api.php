@@ -12,13 +12,9 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 */
 
-// Auth Routes
+// Auth Routes (login & register tetap publik)
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
-
-// Public Album Routes
-Route::get('/album', [AlbumController::class, 'index']);
-Route::get('/album/{album}', [AlbumController::class, 'show']);
 
 /*
 |--------------------------------------------------------------------------
@@ -33,6 +29,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', function (Request $request) {
         return response()->json(['success' => true, 'data' => $request->user()]);
     });
+
+    // Album: list & detail butuh login (privacy pasangan)
+    Route::get('/album', [AlbumController::class, 'index']);
+    Route::get('/album/{album}', [AlbumController::class, 'show']);
 
     // Album CRUD (Store, Update, Delete)
     Route::post('/album', [AlbumController::class, 'store']);
